@@ -14,7 +14,7 @@ resource "openstack_compute_instance_v2" "wp-terraform" {
       agent = false
   }
   network {
-    name = "roi-net"
+    #name = "terra-net"
+    name = "${openstack_networking_network_v2.terra-net.name}"
   }
 }
-
