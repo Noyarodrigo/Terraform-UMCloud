@@ -8,7 +8,9 @@ resource "openstack_networking_secgroup_rule_v2" "sg-terra-app-ssh" {
   protocol          = "tcp"
   port_range_min    = 22
   port_range_max    = 22
-  remote_group_id = "${openstack_networking_secgroup_v2.sg-terra-lb.id}"
+  #remote_group_id = "${openstack_networking_secgroup_v2.sg-terra-lb.id}"
+  #sin bastion comentar la de abajo y descomentar la de arriba
+  remote_group_id = "${openstack_networking_secgroup_v2.sg-terra-bastion.id}"
   security_group_id = "${openstack_networking_secgroup_v2.sg-terra-app.id}"
 }
 #http
@@ -32,6 +34,8 @@ resource "openstack_networking_secgroup_rule_v2" "sg-terra-lb-ssh" {
   port_range_min    = 22
   port_range_max    = 22
   security_group_id = "${openstack_networking_secgroup_v2.sg-terra-lb.id}"
+  #sin bastion comentar la de abajo
+  remote_group_id = "${openstack_networking_secgroup_v2.sg-terra-bastion.id}"
 }
 #HTTP
 resource "openstack_networking_secgroup_rule_v2" "sg-terra-lb-http" {
@@ -61,7 +65,9 @@ resource "openstack_networking_secgroup_rule_v2" "sg-terra-db-ssh" {
   protocol          = "tcp"
   port_range_min    = 22
   port_range_max    = 22
-  remote_group_id = "${openstack_networking_secgroup_v2.sg-terra-lb.id}"
+  #remote_group_id = "${openstack_networking_secgroup_v2.sg-terra-lb.id}"
+  #sin bastion comentar la de abajo y descomentar la de arriba
+  remote_group_id = "${openstack_networking_secgroup_v2.sg-terra-bastion.id}"
   security_group_id = "${openstack_networking_secgroup_v2.sg-terra-db.id}"
 }
 #mysql from the app (idem)
@@ -73,4 +79,15 @@ resource "openstack_networking_secgroup_rule_v2" "sg-terra-db-mysql" {
   port_range_max    = 3306 
   remote_group_id = "${openstack_networking_secgroup_v2.sg-terra-app.id}"
   security_group_id = "${openstack_networking_secgroup_v2.sg-terra-db.id}"
+}
+
+#BASTION RULES
+#ssh ingress
+resource "openstack_networking_secgroup_rule_v2" "sg-terra-bastion-ssh" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 22
+  port_range_max    = 22
+  security_group_id = "${openstack_networking_secgroup_v2.sg-terra-bastion.id}"
 }
