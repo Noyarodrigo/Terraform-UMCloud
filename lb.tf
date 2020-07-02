@@ -30,9 +30,7 @@ resource "null_resource" "remoteexec" {
   provisioner "remote-exec" {
     inline = [
       #"sudo apt-get update",
-      #"sudo apt-get install -y curl",
       "touch Here",
-      #"ssh-add",
       "ssh -o StrictHostKeyChecking=no ubuntu@${openstack_compute_instance_v2.wp-terraform.access_ip_v4} 'touch now_here'"
     ]
   }
