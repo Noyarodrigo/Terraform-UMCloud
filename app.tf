@@ -7,7 +7,7 @@ resource "openstack_compute_instance_v2" "wp-terraform" {
   flavor_name	  = "m1.c1m1d20"
   key_pair        = "umcloud"
   security_groups = ["sg-terra-app"]
-  #nada importante
+
   network {
     #name = "terra-net"
     name = "${openstack_networking_network_v2.terra-net.name}"
