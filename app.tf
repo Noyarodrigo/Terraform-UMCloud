@@ -11,5 +11,42 @@ resource "openstack_compute_instance_v2" "wp-terraform" {
   network {
     name = "${openstack_networking_network_v2.terra-net.name}"
   }
+
+  provisioner "file" {
+    source = "./scripts/wp.sh"
+    destination = "/home/ubuntu/wp.sh"
+    connection {
+      bastion_host = openstack_networking_floatingip_v2.fip_bastion.address
+      bastion_user = "ubuntu"
+      bastion_private_key = file("/home/roi/.ssh/id_rsa")
+      bastion_port = 22
+
+      type = "ssh"
+      user = "ubuntu"
+      private_key = file("/home/roi/.ssh/id_rsa")
+      #host = openstack_networking_floatingip_v2.fip_lb.address
+      host = self.access_ip_v4
+      agent = false 
+    }
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "ssh -o StrictHostKeyChecking=no ubuntu@${openstack_compute_instance_v2.wp-terraform.access_ip_v4} 'bash /home/ubuntu/wp.sh'"
+    ]
+  
+    connection {
+      bastion_host = openstack_networking_floatingip_v2.fip_bastion.address
+      bastion_user = "ubuntu"
+      bastion_private_key = file("/home/roi/.ssh/id_rsa")
+      bastion_port = 22
+
+      type = "ssh"
+      user = "ubuntu"
+      private_key = file("/home/roi/.ssh/id_rsa")
+      #host = openstack_networking_floatingip_v2.fip_lb.address
+      host = self.access_ip_v4
+      agent = true 
+    }
+  }
 }
 
