@@ -13,7 +13,7 @@ resource "openstack_compute_instance_v2" "wp-terraform" {
   }
 
   provisioner "file" {
-    source = "./scripts/wp.sh"
+    source = "./scripts/netdatainstaller.sh"
     destination = "/home/ubuntu/wp.sh"
     connection {
       bastion_host = openstack_networking_floatingip_v2.fip_bastion.address
@@ -21,6 +21,7 @@ resource "openstack_compute_instance_v2" "wp-terraform" {
       bastion_private_key = file("/home/roi/.ssh/id_rsa")
       bastion_port = 22
 
+      timeout = "15m"
       type = "ssh"
       user = "ubuntu"
       private_key = file("/home/roi/.ssh/id_rsa")
@@ -40,6 +41,7 @@ resource "openstack_compute_instance_v2" "wp-terraform" {
       bastion_private_key = file("/home/roi/.ssh/id_rsa")
       bastion_port = 22
 
+      timeout = "15m"
       type = "ssh"
       user = "ubuntu"
       private_key = file("/home/roi/.ssh/id_rsa")
