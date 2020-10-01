@@ -9,10 +9,45 @@ resource "openstack_compute_instance_v2" "lb-terraform" {
   #! The floating ip is set on the floatingip.tf file
 
   network {
-    #name = "terra-net"
     name = "${openstack_networking_network_v2.terra-net.name}"
   }
-  provisioner "local-exec" {
-    command = "echo ${openstack_compute_instance_v2.wp-terraform.access_ip_v4} >> log"
+
+  provisioner "file" {
+    source = "./scripts/netdatainstaller.sh"
+    destination = "/home/ubuntu/wp.sh"
+    connection {
+      bastion_host = openstack_networking_floatingip_v2.fip_bastion.address
+      bastion_user = "ubuntu"
+      bastion_private_key = file("/home/roi/.ssh/id_rsa")
+      bastion_port = 22
+
+      timeout = "15m"
+      type = "ssh"
+      user = "ubuntu"
+      private_key = file("/home/roi/.ssh/id_rsa")
+      #host = openstack_networking_floatingip_v2.fip_lb.address
+      host = self.access_ip_v4
+      agent = false 
+    }
+  }
+  provisioner "remote-exec" {
+    inline = [
+      #"ssh -o StrictHostKeyChecking=no ubuntu@$self.access_ip_v4 'bash /home/ubuntu/wp.sh'"
+    ]
+  
+    connection {
+      bastion_host = openstack_networking_floatingip_v2.fip_bastion.address
+      bastion_user = "ubuntu"
+      bastion_private_key = file("/home/roi/.ssh/id_rsa")
+      bastion_port = 22
+
+      timeout = "15m"
+      type = "ssh"
+      user = "ubuntu"
+      private_key = file("/home/roi/.ssh/id_rsa")
+      #host = openstack_networking_floatingip_v2.fip_lb.address
+      host = self.access_ip_v4
+      agent = false 
+    }
   }
 }

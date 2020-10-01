@@ -1,8 +1,8 @@
 #app instance
 resource "openstack_compute_instance_v2" "wp-terraform" {
-  #count = 2 
-  #name = "${format("wp-terraform-%d", count.index+1)}"
-  name            = "wp-terraform"
+  count = 1 
+  name = "${format("wp-terraform-%d", count.index+1)}"
+  #name            = "wp-terraform"
   image_id        = "bfbef523-f7d3-462d-aa0a-59d188c6a553"
   flavor_name	  = "m1.c1m1d20"
   key_pair        = "umcloud"
@@ -12,7 +12,7 @@ resource "openstack_compute_instance_v2" "wp-terraform" {
     name = "${openstack_networking_network_v2.terra-net.name}"
   }
 
-  provisioner "file" {
+  /*provisioner "file" {
     source = "./scripts/netdatainstaller.sh"
     destination = "/home/ubuntu/wp.sh"
     connection {
@@ -29,12 +29,12 @@ resource "openstack_compute_instance_v2" "wp-terraform" {
       host = self.access_ip_v4
       agent = false 
     }
-  }
+  }*/
   provisioner "remote-exec" {
-    inline = [
-      "ssh -o StrictHostKeyChecking=no ubuntu@${openstack_compute_instance_v2.wp-terraform.access_ip_v4} 'bash /home/ubuntu/wp.sh'"
-    ]
-  
+    #inline = [
+    #  "ssh -o StrictHostKeyChecking=no ubuntu@self.access_ip_v4 'bash /home/ubuntu/wp.sh'"
+    #]
+	scripts=["./scripts/netdatainstaller.sh"]
     connection {
       bastion_host = openstack_networking_floatingip_v2.fip_bastion.address
       bastion_user = "ubuntu"
@@ -47,7 +47,7 @@ resource "openstack_compute_instance_v2" "wp-terraform" {
       private_key = file("/home/roi/.ssh/id_rsa")
       #host = openstack_networking_floatingip_v2.fip_lb.address
       host = self.access_ip_v4
-      agent = true 
+      agent = false 
     }
   }
 }
